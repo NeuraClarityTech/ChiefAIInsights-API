@@ -1,5 +1,4 @@
 # requirements.txt addition
-httpx==0.27.0
 
 # In your code
 import httpx
