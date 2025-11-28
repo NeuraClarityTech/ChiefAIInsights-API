@@ -8,9 +8,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from database.connection import init_connection_pool, close_connection_pool
-from api.routes import router as api_router
-from api.auth_routes import router as auth_router
+from backend.database.connection import init_connection_pool, close_connection_pool
+from backend.api.routes import router as api_router
+from backend.api.auth_routes import router as auth_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
