@@ -8,9 +8,9 @@ from psycopg2.extras import RealDictCursor
 from datetime import timedelta
 import uuid
 
-from database.connection import get_db
-from models.user import UserRegister, UserLogin, UserResponse, Token, MessageResponse, TokenRefresh
-from utils.auth import (
+from backend.database.connection import get_db
+from backend.models.user import UserRegister, UserLogin, UserResponse, Token, MessageResponse, TokenRefresh
+from backend.utils.auth import (
     hash_password, authenticate_user, create_access_token, create_refresh_token,
     get_current_user, store_refresh_token, validate_refresh_token, 
     revoke_refresh_token, update_last_login, get_user_by_email, 
