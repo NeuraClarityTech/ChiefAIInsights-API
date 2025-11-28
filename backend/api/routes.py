@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, Form, HTTPException
 from datetime import datetime
-from utils.google_sheet import get_worksheet
+from utils.google_sheet import read_google_sheet
 from utils.mailer import send_thank_you, notify_admin
 
 router = APIRouter()
