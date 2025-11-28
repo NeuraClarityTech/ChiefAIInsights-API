@@ -3,3 +3,8 @@ uvicorn[standard]
 gunicorn
 httpx
 python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+psycopg2-binary
+pydantic[email]
