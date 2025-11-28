@@ -13,8 +13,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from psycopg2.extras import RealDictCursor
 
-from database.connection import get_db
-from models.user import TokenData, UserInDB
+from backend.database.connection import get_db
+from backend.models.user import TokenData, UserInDB
 
 # Configuration
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
