@@ -1,32 +1,26 @@
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies needed for compilation
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    python3-dev \
-    cargo \
-    rustc \
+    gcc \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements file
-COPY ChiefAIInsights-API-V2/requirements.txt .
+# Copy requirements first (for better caching)
+COPY requirements.txt .
 
-# Upgrade pip and install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY ChiefAIInsights-API-V2/backend ./backend
+# Copy the entire application
+COPY . .
 
-# Expose the port
+# Expose port
 EXPOSE 10000
 
-# Set environment variable for Python
-ENV PYTHONUNBUFFERED=1
-
 # Start command
-CMD cd backend && gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-10000} --workers 1 --timeout 120
+CMD ["gunicorn", "backend.main:app", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:10000"]
