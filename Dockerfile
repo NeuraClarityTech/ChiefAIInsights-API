@@ -13,14 +13,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
-COPY ChiefAIInsights-Backend/requirements.txt .
+COPY ChiefAIInsights-API-V2/requirements.txt .
 
 # Upgrade pip and install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY ChiefAIInsights-Backend/backend ./backend
+COPY ChiefAIInsights-API-V2/backend ./backend
 
 # Expose the port
 EXPOSE 10000
