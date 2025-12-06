@@ -1,79 +1,35 @@
-# backend/database/connection.py
-"""
-Database connection management for ChiefAI Insights
-Handles PostgreSQL connection to Supabase with connection pooling
-"""
-
 import os
-from typing import Generator
-import psycopg2
-from psycopg2 import pool
-from psycopg2.extras import RealDictCursor
+from contextlib import asynccontextmanager
+import asyncpg
 
-# Database connection pool
-connection_pool = None
 
-def init_connection_pool():
-    """Initialize database connection pool"""
-    global connection_pool
-    
-    database_url = os.getenv("DATABASE_URL")
-    
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable not set")
-    
-    try:
-        connection_pool = psycopg2.pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=10,
-            dsn=database_url
-        )
-        print("✅ Database connection pool initialized")
-    except Exception as e:
-        print(f"❌ Error initializing connection pool: {e}")
-        raise
+DATABASE_URL = os.getenv("DATABASE_URL")
+pool = None
 
-def get_db_connection():
-    """
-    Get a database connection from the pool
-    """
-    global connection_pool
-    
-    if connection_pool is None:
-        init_connection_pool()
-    
-    try:
-        connection = connection_pool.getconn()
-        return connection
-    except Exception as e:
-        print(f"❌ Error getting connection: {e}")
-        raise
 
-def release_db_connection(connection):
-    """Return a connection to the pool"""
-    global connection_pool
+async def init_db():
+    global pool
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable is not set")
     
-    if connection_pool and connection:
-        connection_pool.putconn(connection)
+    pool = await asyncpg.create_pool(
+        DATABASE_URL,
+        min_size=1,
+        max_size=10,
+        command_timeout=60
+    )
+    print("✅ Database connection pool created")
 
-def get_db() -> Generator:
-    """
-    Dependency for FastAPI endpoints
-    """
-    connection = get_db_connection()
-    try:
-        yield connection
-        connection.commit()
-    except Exception as e:
-        connection.rollback()
-        raise
-    finally:
-        release_db_connection(connection)
 
-def close_connection_pool():
-    """Close all connections in the pool"""
-    global connection_pool
-    
-    if connection_pool:
-        connection_pool.closeall()
+async def close_db():
+    global pool
+    if pool:
+        await pool.close()
         print("✅ Database connection pool closed")
+
+
+async def get_db():
+    if not pool:
+        raise RuntimeError("Database pool not initialized")
+    async with pool.acquire() as connection:
+        yield connection
